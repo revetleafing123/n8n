@@ -1,0 +1,7 @@
+# Keep the build context tiny. Only the Dockerfile is used by the build,
+# so ignore everything else (README, yaml, docs, git junk).
+.git
+.gitignore
+README.md
+hostless.yaml
+*.md

@@ -1,0 +1,18 @@
+# Hostless app configuration (https://docs.hostless.cloud/app/hostlessfile)
+# Build from the Dockerfile in this repo.
+build:
+  system: docker
+  dockerfile_path: "./Dockerfile"
+
+# n8n is stateful: exactly one replica, never scaled horizontally.
+scaling:
+  min_replicas: 1
+  max_replicas: 1
+  min_memory: 256
+  max_memory: 768   # stay inside Hostless free pool (1 GiB shared, incl. DB)
+
+# n8n health endpoint.
+health_check:
+  type: http
+  http_path: "/healthz"
+  interval_in_seconds: 30
