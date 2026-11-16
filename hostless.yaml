@@ -1,8 +1,9 @@
 # Hostless app configuration (https://docs.hostless.cloud/app/hostlessfile)
-# Build from the Dockerfile in this repo.
-build:
-  system: docker
-  dockerfile_path: "./Dockerfile"
+#
+# The build system (Docker) is selected in the dashboard, NOT here —
+# putting `dockerfile_path` under `build:` fails schema validation with
+# "whitelistValidation: property dockerfile_path should not exist".
+# Hostless looks for ./Dockerfile in the repo root by default anyway.
 
 # n8n is stateful: exactly one replica, never scaled horizontally.
 scaling:
