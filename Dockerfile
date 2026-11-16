@@ -3,9 +3,12 @@
 # "pull an image from a registry" option, so we reference the official
 # prebuilt image here. The runtime result is identical.
 #
-# Build-arg lets us switch registry mirror in one line if the sandboxed
-# builder cannot reach docker.n8n.io (fall back to Docker Hub).
-ARG N8N_IMAGE=docker.n8n.io/n8nio/n8n:latest
+# Build-arg lets us switch the default registry. Docker Hub is the default
+# because docker.n8n.io rate-limits anonymous pulls (429 Too Many Requests),
+# which fails CI/builder environments. Override with
+#   --build-arg N8N_IMAGE=docker.n8n.io/n8nio/n8n:latest
+# if you need the vendor registry specifically.
+ARG N8N_IMAGE=n8nio/n8n:latest
 FROM ${N8N_IMAGE}
 
 # Hostless runs apps with a read-only root filesystem. /tmp, /root and
