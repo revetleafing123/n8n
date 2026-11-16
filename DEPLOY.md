@@ -135,6 +135,7 @@ Paste into **Hostless → Settings → Environment variables**.
 | `EXECUTIONS_DATA_PRUNE_MAX_COUNT` | `500` | hard cap on stored runs |
 | `N8N_RUNNERS_ENABLED` | `true` | code-node runners |
 | `N8N_DIAGNOSTICS_ENABLED` | `false` | privacy |
+| `N8N_DISABLED_MODULES` | `instance-ai` | **disables Assistant + Agents canvas.** Hostless cannot run the required privileged sandbox (see §9) — without this, the UI blocks on "Add a code sandbox" |
 
 ### ⚠️ Do NOT set
 
@@ -279,6 +280,37 @@ authoring. For real speed you need always-on VM compute:
 - **GCP e2-micro** — 1 vCPU / 1 GB, never expires
 
 ### Python Code nodes do not work
+
+### n8n Assistant / Agent canvas — disable it (`N8N_DISABLED_MODULES`)
+
+The Assistant and Agents need a **code sandbox** to run generated code.
+Self-hosting it requires **four extra containers** including a
+`privileged: true` Docker-in-Docker runner plus mTLS — and every free PaaS
+(Hostless, StackShift, ProductEcho, Suga) forbids privileged containers.
+
+With no sandbox, the setup wizard blocks on **"Add a code sandbox"** (a
+required field, there is no skip). Fix: disable the whole module so the form
+and the editor errors disappear:
+
+```
+N8N_DISABLED_MODULES=instance-ai
+```
+
+Trade-offs:
+- ❌ n8n Assistant chat is off
+- ❌ Settings > Agents shared-sandbox editor is off
+- ✅ **AI Agent nodes inside workflows still work** (they call LLM APIs
+directly — unrelated to `instance-ai`)
+- ✅ everything else is unaffected
+
+Do **not** enter a dummy sandbox URL to pass the form — it accepts the value
+and then fails at runtime with confusing connection errors.
+
+Only migration to a real VM (e.g. Oracle Cloud Always Free, 12 GB ARM, full
+Docker, privileged allowed) makes the sandbox viable: run the 4-container
+sandbox stack on the same compose network and set
+`N8N_SANDBOX_SERVICE_URL=http://sandbox-api:8080` + `N8N_SANDBOX_SERVICE_API_KEY`
+matching `SANDBOX_API_KEYS`.
 The image is a **Docker Hardened Image on Alpine 3.24 with no package manager**
 (`apk` stripped), so Python 3 cannot be installed. Internal Python task runner
 fails and logs:
