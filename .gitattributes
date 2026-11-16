@@ -1,0 +1,5 @@
+# Force LF endings for shell scripts. A CRLF start.sh fails in the
+# container with: bad interpreter: /bin/sh^M
+*.sh    text eol=lf
+Dockerfile text eol=lf
+*.yaml  text eol=lf
